@@ -27,10 +27,10 @@ Todo en **USD**, la moneda de las tarifas en Stays. El precio final se redondea 
 
 | Unidad | Perfil | Mismo día | Día anterior | 2–4 días | Piso |
 |---|---|---|---|---|---|
-| CN-127 | costa | −12% desde 10:00 · −20% desde 15:00 | −10% desde 15:00 | −6% mar/mié, solo llegadas de viernes | US$56 |
-| VM-126 (R) | costa | igual | igual | igual | US$75 |
-| STGO-26 | santiago_centro | −10% desde 09:00 · −18% desde 14:00 | −8% desde 16:00 | — | US$30 |
-| STGO-15 | las_condes | −8% desde 14:00 | — | — | $52.000 |
+| CN-127 | costa | −12% desde 10:00 · −20% desde 15:00 | −10% desde 15:00 | −6% mar/mié, solo llegadas de viernes | US$32 |
+| VM-126 (R) | costa | igual | igual | igual | US$45 |
+| STGO-26 | santiago_centro | −10% desde 09:00 · −18% desde 14:00 | −8% desde 16:00 | — | US$20 |
+| STGO-15 | las_condes | −8% desde 14:00 | — | — | US$39 |
 
 ## Desplegar en Railway
 

@@ -172,14 +172,14 @@ async function tick({ mode = 'run', at = null } = {}) {
       if (!(night.avail > 0)) { plan.push({ unit, date, daysOut: k, action: 'ocupada', price: night.price }); continue; }
 
       // Precio base: el original del día. Si el calendario cambió por fuera (sync de PriceLabs), se toma el nuevo.
-      let base = night.price, applied = 0;
-      if (st && (night.price === st.appliedPrice || night.price === st.base)) { base = st.base; applied = st.appliedPct; }
+      let base = night.price, applied = 0, wasSim = false;
+      if (st && (night.price === st.appliedPrice || night.price === st.base)) { base = st.base; applied = st.appliedPct; wasSim = !!st.simulated; }
       else if (st) { plan.push({ unit, date, note: `precio cambió por fuera (${st.base}→${night.price}); nueva base` }); }
 
       const target = Math.max(uc.floor || 0, roundTo(base * (1 - pct / 100), rules.roundTo ?? ROUND_TO));
       const item = { unit, date, daysOut: k, hora: now.hhmm, base, pct, target, piso: uc.floor || 0, regla: rule ? `${rule.from} -${rule.pct}%` : null };
 
-      if (!pct || pct <= applied) { plan.push({ ...item, action: applied ? `ya aplicado -${applied}%` : 'sin regla' }); continue; }
+      if (!pct || pct <= applied) { plan.push({ ...item, action: applied ? `${wasSim ? 'ya simulado' : 'ya aplicado'} -${applied}%` : 'sin regla' }); continue; }
       if (target >= base) { plan.push({ ...item, action: 'piso impide bajar' }); continue; }
 
       if (preview) { plan.push({ ...item, action: 'aplicaría' }); continue; }

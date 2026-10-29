@@ -115,7 +115,7 @@ const td=(t,c)=>{const e=document.createElement('td');e.textContent=t;if(c)e.cla
 const tag=(t,c)=>{const s=document.createElement('span');s.className='tag '+c;s.textContent=t;return s};
 function tagFor(a){a=String(a||'');
   if(a==='aplicado')return['Aplicado','t-aplicado'];if(a==='simulado')return['Simulado','t-simulado'];if(a==='aplicaría')return['Aplicaría','t-aplicaria'];
-  if(a==='ocupada')return['Vendida','t-ocupada'];if(a.startsWith('piso'))return['Piso impide','t-piso'];if(a.startsWith('ya aplicado'))return[a.replace('ya aplicado','Ya aplicado'),'t-ya'];
+  if(a==='ocupada')return['Vendida','t-ocupada'];if(a.startsWith('piso'))return['Piso impide','t-piso'];if(a.startsWith('ya aplicado'))return[a.replace('ya aplicado','Ya aplicado'),'t-ya'];if(a.startsWith('ya simulado'))return[a.replace('ya simulado','Ya simulado'),'t-simulado'];
   if(a==='sin regla')return['Sin regla ahora','t-ya'];if(a==='error'||a.startsWith('error'))return['Error','t-error'];return[a||'—','t-ya']}
 async function api(path,opt={}){
   const r=await fetch(path,{...opt,headers:{'content-type':'application/json','x-admin-token':TOKEN,...(opt.headers||{})}});

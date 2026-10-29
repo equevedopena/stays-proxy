@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Descuentos Redibuk</title>
+<style>
+/* Panel operativo: barra de estado arriba, unidades al centro, registro abajo. */
+:root{
+  --bg:#f4f6f6;--panel:#fff;--ink:#14272a;--muted:#5d6f72;--line:#d8e0e1;
+  --accent:#0b6e75;--accent-soft:#e0eff0;
+  --ok:#1d7a45;--ok-soft:#e1f2e7;--warn:#9a5b00;--warn-soft:#fbefd9;--bad:#b3261e;--bad-soft:#fbe4e2;--mute-soft:#eceff0;
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;--mono:ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1719;--panel:#162124;--ink:#e3ebeb;--muted:#93a4a7;--line:#2a3a3d;
+  --accent:#5cc3ca;--accent-soft:#16363a;
+  --ok:#6fd39a;--ok-soft:#163324;--warn:#f0b35c;--warn-soft:#3a2b12;--bad:#f2948d;--bad-soft:#3d1c1a;--mute-soft:#1f2c2f;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--font)}
+.wrap{max-width:72rem;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
+h1{font-size:22px;margin:0}
+h2{font-size:15px;margin:0 0 10px}
+.sub{color:var(--muted);margin:2px 0 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:4px 12px;font-weight:600;font-size:13px}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-soft);color:var(--ok)}.p-off{background:var(--mute-soft);color:var(--muted)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}.p-bad{background:var(--bad-soft);color:var(--bad)}
+button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--ink)}button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+button.danger{background:var(--bad);border-color:var(--bad);color:var(--panel)}
+input{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--panel);color:var(--ink);min-width:0;flex:1}
+.spacer{flex:1}
+.meta{color:var(--muted);font-size:13px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{text-align:right;white-space:nowrap}
+.tag{display:inline-block;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600;white-space:nowrap}
+.t-aplicado{background:var(--ok-soft);color:var(--ok)}.t-simulado,.t-aplicaria{background:var(--accent-soft);color:var(--accent)}
+.t-ocupada{background:var(--mute-soft);color:var(--muted)}.t-piso{background:var(--warn-soft);color:var(--warn)}
+.t-error{background:var(--bad-soft);color:var(--bad)}.t-ya{background:var(--mute-soft);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:10px}
+.unit{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.unit b{font-size:15px}.unit ul{margin:6px 0 0;padding-left:16px;color:var(--muted);font-size:13px}
+.confirm{background:var(--bad-soft);border:1px solid var(--bad);border-radius:8px;padding:10px 12px}
+.empty{color:var(--muted);padding:8px 0}
+.err{color:var(--bad);font-weight:600}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="row">
+    <div><h1>Descuentos por hora</h1><p class="sub">Redibuk · proxy de Stays · hora de Chile</p></div>
+    <span class="spacer"></span><span class="meta" id="upd"></span>
+  </header>
+
+  <section class="card" id="login">
+    <h2>Clave de acceso</h2>
+    <form class="row" id="loginForm">
+      <input id="tok" type="password" autocomplete="current-password" placeholder="Pega el ADMIN_TOKEN" aria-label="Clave">
+      <button class="primary" type="submit">Entrar</button>
+    </form>
+    <p class="meta">La clave queda guardada solo en este navegador.</p>
+    <p class="err" id="loginErr" hidden></p>
+  </section>
+
+  <div id="app" hidden>
+    <section class="card">
+      <div class="row">
+        <span class="pill" id="pEnabled">—</span>
+        <span class="pill" id="pMode">—</span>
+        <span class="meta" id="lastRun"></span>
+        <span class="spacer"></span>
+        <button id="bToggle" type="button">—</button>
+        <button id="bMode" type="button">—</button>
+        <button id="bRun" type="button">Revisar ahora</button>
+        <button id="bOut" type="button">Salir</button>
+      </div>
+      <div class="confirm" id="confirm" hidden>
+        <p style="margin:0 0 8px"><b>¿Pasar a modo real?</b> El proxy empezará a cambiar precios en Stays (y en Airbnb) en las unidades de la prueba.</p>
+        <div class="row"><button class="danger" id="bYes" type="button">Sí, cambiar precios de verdad</button><button id="bNo" type="button">Cancelar</button></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row"><h2 style="margin:0">Qué haría ahora</h2><span class="spacer"></span><span class="meta" id="nowTxt"></span></div>
+      <p class="meta" style="margin:4px 0 10px">Vista previa de hoy y los próximos días. No cambia nada.</p>
+      <div class="tbl"><table><thead><tr><th>Unidad</th><th>Noche</th><th>Días antes</th><th>Regla</th><th class="n">Precio base</th><th class="n">Descuento</th><th class="n">Precio nuevo</th><th class="n">Piso</th><th>Estado</th></tr></thead><tbody id="prev"></tbody></table></div>
+    </section>
+
+    <section class="card">
+      <h2>Registro</h2>
+      <div class="tbl"><table><thead><tr><th>Cuándo</th><th>Tipo</th><th>Unidad</th><th>Noche</th><th class="n">Base</th><th class="n">%</th><th class="n">Precio</th><th>Detalle</th></tr></thead><tbody id="log"></tbody></table></div>
+    </section>
+
+    <section class="card">
+      <h2>Reglas activas</h2>
+      <div class="grid" id="rules"></div>
+    </section>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let TOKEN='';try{TOKEN=localStorage.getItem('staysTok')||''}catch(e){}
+const usd=v=>v==null||v===''?'—':'US$'+Number(v).toLocaleString('es-CL',{maximumFractionDigits:2});
+const fmtDate=s=>{if(!s)return'—';const d=new Date(s+'T12:00:00');return d.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'})};
+const fmtWhen=s=>new Date(s).toLocaleString('es-CL',{timeZone:'America/Santiago',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const td=(t,c)=>{const e=document.createElement('td');e.textContent=t;if(c)e.className=c;return e};
+const tag=(t,c)=>{const s=document.createElement('span');s.className='tag '+c;s.textContent=t;return s};
+function tagFor(a){a=String(a||'');
+  if(a==='aplicado')return['Aplicado','t-aplicado'];if(a==='simulado')return['Simulado','t-simulado'];if(a==='aplicaría')return['Aplicaría','t-aplicaria'];
+  if(a==='ocupada')return['Vendida','t-ocupada'];if(a.startsWith('piso'))return['Piso impide','t-piso'];if(a.startsWith('ya aplicado'))return[a.replace('ya aplicado','Ya aplicado'),'t-ya'];
+  if(a==='sin regla')return['Sin regla ahora','t-ya'];if(a==='error'||a.startsWith('error'))return['Error','t-error'];return[a||'—','t-ya']}
+async function api(path,opt={}){
+  const r=await fetch(path,{...opt,headers:{'content-type':'application/json','x-admin-token':TOKEN,...(opt.headers||{})}});
+  if(r.status===401)throw new Error('401');const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);return j}
+let cfg={};
+async function loadStatus(){
+  const s=await api('/auto/status');cfg=s;
+  const pe=$('pEnabled');pe.textContent=s.enabled?'Encendido':'Apagado';pe.className='pill '+(s.enabled?'p-ok':'p-off');
+  const pm=$('pMode');pm.textContent=s.dryRun?'Simulación (no cambia precios)':'Modo real: cambia precios';pm.className='pill '+(s.dryRun?'p-warn':'p-bad');
+  $('bToggle').textContent=s.enabled?'Apagar':'Encender';$('bMode').textContent=s.dryRun?'Pasar a modo real…':'Volver a simulación';
+  $('lastRun').textContent=s.lastRun?'Última revisión: '+fmtWhen(s.lastRun.at):'Aún sin revisiones';
+  const g=$('rules');g.replaceChildren();
+  if(s.rules&&s.rules.units)for(const[u,c]of Object.entries(s.rules.units)){
+    const d=document.createElement('div');d.className='unit';const b=document.createElement('b');b.textContent=u;d.append(b);
+    const m=document.createElement('div');m.className='meta';m.textContent=`${c.profile.replace('_',' ')} · piso ${usd(c.floor)}`;d.append(m);
+    const ul=document.createElement('ul');(s.rules.profiles[c.profile]||[]).forEach(r=>{const li=document.createElement('li');
+      const dd=Array.isArray(r.daysOut)?`${r.daysOut[0]}–${r.daysOut[1]} días antes`:r.daysOut===0?'Mismo día':r.daysOut===1?'Día anterior':r.daysOut+' días antes';
+      li.textContent=`${dd}: −${r.pct}% desde ${r.from}${r.onlyOnWeekdays?' (mar/mié, llegadas de viernes)':''}`;ul.append(li)});d.append(ul);g.append(d)}
+}
+async function loadPreview(){
+  const p=await api('/auto/preview');$('nowTxt').textContent=`Ahora: ${fmtDate(p.now.date)} ${p.now.hhmm}`;
+  const tb=$('prev');tb.replaceChildren();
+  if(!p.plan.length){const tr=document.createElement('tr');const c=td('Ninguna noche con regla en este momento.','empty');c.colSpan=9;tr.append(c);tb.append(tr);return}
+  p.plan.forEach(x=>{const tr=document.createElement('tr');const[t,c]=tagFor(x.error?'error':x.action);
+    tr.append(td(x.unit),td(fmtDate(x.date)),td(x.daysOut??'—','n'),td(x.regla||'—'),td(usd(x.base??x.price),'n'),td(x.pct?'−'+x.pct+'%':'—','n'),td(x.target?usd(x.target):'—','n'),td(x.piso?usd(x.piso):'—','n'));
+    const st=document.createElement('td');st.append(tag(t,c));if(x.error){const e=document.createElement('div');e.className='meta';e.textContent=x.error;st.append(e)}tr.append(st);tb.append(tr)})
+}
+async function loadLog(){
+  const L=(await api('/auto/log?limit=200')).slice().reverse();const tb=$('log');tb.replaceChildren();
+  if(!L.length){const tr=document.createElement('tr');const c=td('Todavía no hay registros. Se llenan cada 15 minutos cuando hay una regla activa.','empty');c.colSpan=8;tr.append(c);tb.append(tr);return}
+  L.forEach(x=>{const tr=document.createElement('tr');const[t,c]=tagFor(x.tipo);const tt=document.createElement('td');tt.append(tag(x.tipo==='config'?'Ajuste':t,x.tipo==='config'?'t-ya':c));
+    const det=x.tipo==='config'?`${x.enabled?'encendido':'apagado'} · ${x.dryRun?'simulación':'modo real'}`:(x.error||x.regla||'');
+    tr.append(td(fmtWhen(x.at)),tt,td(x.unit||'—'),td(x.date?fmtDate(x.date):'—'),td(x.base!=null?usd(x.base):'—','n'),td(x.pct?'−'+x.pct+'%':'—','n'),td(x.target!=null?usd(x.target):'—','n'),td(det));tb.append(tr)})
+}
+async function refresh(){
+  try{await loadStatus();$('login').hidden=true;$('app').hidden=false;$('upd').textContent='Actualizado '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+    await Promise.all([loadPreview().catch(e=>{$('prev').replaceChildren();const tr=document.createElement('tr');const c=td('No se pudo leer Stays: '+e.message,'err');c.colSpan=9;tr.append(c);$('prev').append(tr)}),loadLog()]);
+  }catch(e){if(e.message==='401'){$('login').hidden=false;$('app').hidden=true;if(TOKEN){$('loginErr').textContent='Clave incorrecta. Revisa el ADMIN_TOKEN en Railway.';$('loginErr').hidden=false}}else{$('upd').textContent='Error: '+e.message}}
+}
+$('loginForm').addEventListener('submit',ev=>{ev.preventDefault();TOKEN=$('tok').value.trim();try{localStorage.setItem('staysTok',TOKEN)}catch(e){}refresh()});
+$('bOut').onclick=()=>{TOKEN='';try{localStorage.removeItem('staysTok')}catch(e){}$('app').hidden=true;$('login').hidden=false;$('tok').value=''};
+$('bToggle').onclick=async()=>{await api('/auto/config',{method:'POST',body:JSON.stringify({enabled:!cfg.enabled})});refresh()};
+$('bMode').onclick=async()=>{if(cfg.dryRun){$('confirm').hidden=false;return}await api('/auto/config',{method:'POST',body:JSON.stringify({dryRun:true})});refresh()};
+$('bYes').onclick=async()=>{$('confirm').hidden=true;await api('/auto/config',{method:'POST',body:JSON.stringify({dryRun:false})});refresh()};
+$('bNo').onclick=()=>{$('confirm').hidden=true};
+$('bRun').onclick=async()=>{$('bRun').disabled=true;$('bRun').textContent='Revisando…';try{await api('/auto/run',{method:'POST'})}catch(e){$('upd').textContent='Error: '+e.message}finally{$('bRun').disabled=false;$('bRun').textContent='Revisar ahora';refresh()}};
+if(TOKEN)refresh();setInterval(()=>{if(TOKEN&&!$('app').hidden)refresh()},60000);
+</script>
+</body>
+</html>

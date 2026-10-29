@@ -16,6 +16,9 @@ function authHeader() {
   return { Authorization: `Basic ${b64}`, 'Content-Type': 'application/json' };
 }
 
+// ── Panel visual (los datos piden la clave) ──────────────────────────────────
+app.get('/panel', (req, res) => res.sendFile(require('path').join(__dirname, 'panel.html')));
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.json({ status: 'ok', domain: DOMAIN }));
 

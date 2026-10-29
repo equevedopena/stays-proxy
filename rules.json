@@ -1,0 +1,82 @@
+{
+  "_nota": "Reglas de descuento por hora. Horas en la zona horaria indicada. daysOut = días entre hoy y la noche de llegada (0 = hoy). pct = % de descuento sobre el precio vigente del día. weekdays: 1=lunes ... 7=domingo. Precios y pisos en USD (moneda de las tarifas en Stays). roundTo: redondeo del precio final (1 = dólar entero).",
+  "timezone": "America/Santiago",
+  "currency": "USD",
+  "units": {
+    "CN-127": {
+      "profile": "costa",
+      "floor": 56
+    },
+    "VM-126 (R)": {
+      "profile": "costa",
+      "floor": 75
+    },
+    "STGO-26": {
+      "profile": "santiago_centro",
+      "floor": 30
+    },
+    "STGO-15": {
+      "profile": "las_condes",
+      "floor": 49
+    }
+  },
+  "profiles": {
+    "costa": [
+      {
+        "daysOut": 0,
+        "from": "10:00",
+        "pct": 12
+      },
+      {
+        "daysOut": 0,
+        "from": "15:00",
+        "pct": 20
+      },
+      {
+        "daysOut": 1,
+        "from": "15:00",
+        "pct": 10
+      },
+      {
+        "daysOut": [
+          2,
+          4
+        ],
+        "from": "00:00",
+        "pct": 6,
+        "onlyOnWeekdays": [
+          2,
+          3
+        ],
+        "onlyArrivalWeekdays": [
+          5
+        ]
+      }
+    ],
+    "santiago_centro": [
+      {
+        "daysOut": 0,
+        "from": "09:00",
+        "pct": 10
+      },
+      {
+        "daysOut": 0,
+        "from": "14:00",
+        "pct": 18
+      },
+      {
+        "daysOut": 1,
+        "from": "16:00",
+        "pct": 8
+      }
+    ],
+    "las_condes": [
+      {
+        "daysOut": 0,
+        "from": "14:00",
+        "pct": 8
+      }
+    ]
+  },
+  "roundTo": 1
+}

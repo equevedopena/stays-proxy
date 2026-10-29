@@ -1,6 +1,7 @@
 const express = require('express');
 const cors    = require('cors');
 const axios   = require('axios');
+const auto    = require('./scheduler');
 
 const app = express();
 app.use(cors());
@@ -59,7 +60,7 @@ app.post('/search', async (req, res) => {
 });
 
 // ── Aplicar descuento (precio por evento/fecha) ───────────────────────────────
-app.post('/apply-discount', async (req, res) => {
+app.post('/apply-discount', auto.requireToken, async (req, res) => {
   try {
     const { listingId, from, to, price, discount, label } = req.body;
     const r = await axios.post(
@@ -81,7 +82,7 @@ app.post('/apply-discount', async (req, res) => {
 });
 
 // ── Aplicar descuento a múltiples unidades ────────────────────────────────────
-app.post('/apply-batch', async (req, res) => {
+app.post('/apply-batch', auto.requireToken, async (req, res) => {
   const { listings, from, to, discount, label } = req.body;
   const results = [];
   for (const u of listings) {
@@ -101,6 +102,15 @@ app.post('/apply-batch', async (req, res) => {
     await new Promise(r => setTimeout(r, 100)); // throttle
   }
   res.json(results);
+});
+
+// ── Descuentos por hora (ver scheduler.js y rules.json) ──────────────────────
+auto.register(app, {
+  domain: DOMAIN,
+  http: {
+    get:  (url)       => axios.get(url, { headers: authHeader(), timeout: 20000 }),
+    post: (url, body) => axios.post(url, body, { headers: authHeader(), timeout: 20000 }),
+  },
 });
 
 const PORT = process.env.PORT || 3000;
